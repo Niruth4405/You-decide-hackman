@@ -3,7 +3,7 @@ import CreateNlogs from './components/CreateNlogs'
 import AddSingleLogEntry from './components/AddSingleLogEntry'
 const ClientMain = () => {
   return (
-    <div className='bg-blue-700'>
+    <div >
       <AddSingleLogEntry/>
       <CreateNlogs/>
     </div>
