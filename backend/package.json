@@ -17,6 +17,11 @@
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.19.2",
-    "nodemon": "^3.1.10"
+    "nodemon": "^3.1.10",
+    "@emailjs/nodejs": "^2.2.0",
+    "csv-parser": "^3.0.0",
+    "luxon": "^3.4.3",
+    "moralis": "^2.23.1",
+    "web3": "^4.1.1"
   }
 }
