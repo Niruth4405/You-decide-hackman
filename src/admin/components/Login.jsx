@@ -18,7 +18,7 @@ export default function LoginPage() {
   return (
     <div
       className={`min-h-screen flex items-center justify-center px-4 ${
-        theme === "dark" ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-900"
+        theme === "dark" ? "bg-black text-white" : "bg-gray-100 text-black"
       }`}
     >
       <div className="max-w-md w-full space-y-6 p-8 rounded-lg shadow-lg bg-white dark:bg-gray-800">
