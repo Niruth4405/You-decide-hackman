@@ -33,7 +33,7 @@ const Navbar = () => {
           {/* Center: Navigation Links */}
           <div className="hidden md:flex items-center space-x-4">
             <NavLink
-              to="/admin/allLogs"
+              to="/admin/all-logs"
               className={({ isActive }) => 
                 `${linkClasses} ${isActive ? activeLinkClasses : inactiveLinkClasses}`
               }
@@ -42,7 +42,7 @@ const Navbar = () => {
               <span>All Logs</span>
             </NavLink>
             <NavLink
-              to="/admin/blockedips"
+              to="/admin/blocked-ips"
               className={({ isActive }) => 
                 `${linkClasses} ${isActive ? activeLinkClasses : inactiveLinkClasses}`
               }

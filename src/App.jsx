@@ -1,6 +1,5 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
-import Client from "./client/ClientMain";
 import Login from "./client/components/Login";
 import Signup from "./client/components/Signup";
 import AddSingleLogEntry from "./client/components/AddSingleLogEntry";
@@ -8,7 +7,6 @@ import CreateNlogs from "./client/components/CreateNlogs";
 import LandingPage from "./client/components/landingPage";
 import Navbar from "./client/components/navbar";
 import { useLocation } from "react-router-dom";
-import ParticlesComponent from "./client/components/bg";
 import Features from "./client/components/features";
 import AllLogs from "./admin/components/AllLogs";
 import BlockedIps from "./admin/components/BlockedIPS";
@@ -19,21 +17,18 @@ import MainDashboard from "./admin/MainDashboard";
 const App = () => {
   const location = useLocation();
   
-  // Define admin routes for easier maintenance
-  const adminRoutes = ['/admin', '/admin/all-logs', '/admin/blocked-ips', '/admin/log-analysis'];
-  const isAdminRoute = adminRoutes.includes(location.pathname);
-  
-  // Define public routes where no navbar should show
-  const publicRoutes = ['/', '/login', '/signup', '/features'];
+  // Determine which navbar to show based on route
+  const isAdminRoute = location.pathname.startsWith('/admin');
+  const publicRoutes = ['/', '/login', '/signup']; // Removed '/features' from here
   const isPublicRoute = publicRoutes.includes(location.pathname);
   
   return (
     <>
-      {/* Show AdminNavbar for all admin routes */}
+      {/* Show AdminNavbar only on admin routes */}
       {isAdminRoute && <AdminNavbar />}
       
-      {/* Show regular Navbar for client routes (not admin, not public) */}
-      {!isAdminRoute && !isPublicRoute && location.pathname !== '/dashboard' && location.pathname !== '/log' && <Navbar />}
+      {/* Show client Navbar on all routes except admin and public routes */}
+      {!isAdminRoute && !isPublicRoute && <Navbar />}
       
       <Routes>
         <Route path="/" element={<LandingPage />} />
