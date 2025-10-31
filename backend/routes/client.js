@@ -4,51 +4,107 @@ const fs = require("fs");
 const { generateRandomLogs, predictMLScore } = require("../utils");
 const { addFilestoIPFS } = require("../ipfs");
 const { addBlock } = require("../web3-methods");
+const User=require('../models/user.model');
+const Log=require('../models/dataModel')
 
 router.post("/addLog", async (req, res) => {
-  const { logData } = req.body;
-  const ml_risk_score = predictMLScore(logData);
-  fs.appendFile(
-    `./${process.env.LOCAL_LOG_FOLDER}/${logData.campLocation}.txt`,
-    `${logData.campLocation},${logData.timestamp},${logData.source},${logData.destination},${logData.user},${logData.device},${logData.eventType},${logData.eventDescription},${logData.eventSeverity},${ml_risk_score}\n`,
-    function (err) {
-      if (err) throw err;
+  try {
+    const  logData  = req.body;
+    console.log("Received log data:", logData);
+      const userEmail=logData.user;
+    // 1️⃣ Find the user (for DB reference)
+    const user = await User.findOne({ email: userEmail });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
     }
-  );
-  fs.appendFile(
-    `./${process.env.LOCAL_LOG_FOLDER}/All.txt`,
-    `${logData.campLocation},${logData.timestamp},${logData.source},${logData.destination},${logData.user},${logData.device},${logData.eventType},${logData.eventDescription},${logData.eventSeverity},${ml_risk_score}\n`,
-    function (err) {
-      if (err) throw err;
-    }
-  );
 
-  res.json({ message: "Success" });
+    // 2️⃣ Predict ML risk score
+    const ml_risk_score = predictMLScore(logData);
+
+    // 3️⃣ Prepare the line to write in files
+    const logLine = `${logData.campLocation},${logData.timestamp},${logData.source},${logData.destination},${logData.user},${logData.device},${logData.eventType},${logData.eventDescription},${logData.eventSeverity},${ml_risk_score}\n`;
+
+    // 4️⃣ Write to individual camp file
+    await fs.promises.appendFile(
+      `./${process.env.LOCAL_LOG_FOLDER}/${logData.campLocation}.txt`,
+      logLine
+    );
+
+    // 5️⃣ Write to global All.txt file
+    await fs.promises.appendFile(
+      `./${process.env.LOCAL_LOG_FOLDER}/All.txt`,
+      logLine
+    );
+
+    // 6️⃣ Save to MongoDB
+    const newLog = new Log({
+      timestamp: logData.timestamp,
+      source: logData.source,
+      destination: logData.destination,
+      user: user._id, // linked to User schema
+      device: logData.device,
+      eventType: logData.eventType,
+      eventDescription: logData.eventDescription,
+      eventSeverity: logData.eventSeverity,
+      campLocation: logData.campLocation,
+      mlRiskScore: ml_risk_score,
+    });
+
+    await newLog.save();
+
+    console.log("✅ Log saved successfully to DB and files");
+    res.status(200).json({ message: "Success" });
+
+  } catch (err) {
+    console.error("❌ Error in addLog API:", err);
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
 });
-router.post("/addLogs", (req, res) => {
-  const { numberoflogs, campLocation } = req.body;
-  let content = "";
-  const logs = generateRandomLogs(numberoflogs, campLocation);
-  logs.forEach(
-    (logData) =>
-      (content += `${campLocation},${logData.timestamp},${logData.source},${logData.destination},${logData.user},${logData.device},${logData.eventType},${logData.eventDescription},${logData.eventSeverity},${logData.mlRiskScore}\n`)
-  );
-  fs.appendFile(
-    `./${process.env.LOCAL_LOG_FOLDER}/${campLocation}.txt`,
-    content,
-    function (err) {
-      if (err) throw err;
+
+
+router.post("/addLogs", async (req, res) => {
+  try {
+    const { numberoflogs, campLocation } = req.body;
+    console.log("inside add logs");
+
+    if (!numberoflogs || !campLocation) {
+      return res.status(400).json({ message: "Missing fields" });
     }
-  );
-  fs.appendFile(
-    `./${process.env.LOCAL_LOG_FOLDER}/All.txt`,
-    content,
-    function (err) {
-      if (err) throw err;
+
+    let content = "";
+    const logs = generateRandomLogs(numberoflogs, campLocation);
+
+    logs.forEach((logData) => {
+      content += `${campLocation},${logData.timestamp},${logData.source},${logData.destination},${logData.user},${logData.device},${logData.eventType},${logData.eventDescription},${logData.eventSeverity},${logData.mlRiskScore}\n`;
+    });
+
+    const folderPath = `./${process.env.LOCAL_LOG_FOLDER}`;
+
+    if (!fs.existsSync(folderPath)) {
+      fs.mkdirSync(folderPath, { recursive: true });
     }
-  );
-  res.json({ message: "Success" });
+
+    await fs.promises.appendFile(`${folderPath}/${campLocation}.txt`, content);
+
+    await fs.promises.appendFile(`${folderPath}/All.txt`, content);
+
+    console.log("before success");
+
+    return res.status(200).json({
+      message: "Success",
+      addedLogs: logs.length,
+      campLocation,
+    });
+  } catch (error) {
+    console.error("Error in /addLogs:", error);
+    return res.status(500).json({
+      message: "Internal Server Error",
+      error: error.message,
+    });
+  }
 });
+
+
 router.post("/triggerIPFSBlockChain", async (req, res) => {
   const response = await addFilestoIPFS([
     {
@@ -144,4 +200,6 @@ router.post("/triggerIPFSBlockChain", async (req, res) => {
 
   res.json({ message: "Success" });
 });
+
+
 module.exports = router;
