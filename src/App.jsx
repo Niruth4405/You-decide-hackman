@@ -5,6 +5,7 @@ import Login from "./client/components/Login";
 import Signup from "./client/components/Signup.jsx";
 
 const App = () => {
+  const location = useLocation();
   return (
     <Routes>
       <Route path="/admin" element={<AdminLogin />} />
