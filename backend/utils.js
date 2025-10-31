@@ -78,6 +78,8 @@ const predictMLScore = (logData) => {
   ).toFixed(2);
   return ml_risk_score;
 };
+
+
 const sendEmail = (logsForMail, logsForBlockedAccess, template) => {
   emailjs
     .send(
@@ -103,6 +105,8 @@ const sendEmail = (logsForMail, logsForBlockedAccess, template) => {
       }
     );
 };
+
+
 const generateRandomLogs = (number, campLocation) => {
   const logs = [];
   const logsForMail = [];
