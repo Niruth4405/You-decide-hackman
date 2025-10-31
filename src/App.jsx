@@ -1,10 +1,11 @@
 import React from 'react'
-
+import {Routes,Route} from "react-router-dom"
 const App = () => {
   return (
-    <div>
-      <h1 className="text-center">Hello world</h1>
-    </div>
+    <Routes>
+  
+      <Route path='admin'/>
+    </Routes>
   )
 }
 
