@@ -1,11 +1,14 @@
-import React from 'react'
+import React from "react";
+import { Routes, Route } from "react-router-dom";
+import Client from "./client/ClientMain";
 
 const App = () => {
   return (
-    <div>
-      <h1 className="text-center">Hello world</h1>
-    </div>
-  )
-}
+    <Routes>
+     <Client/>
+      <Route path="admin" />
+    </Routes>
+  );
+};
 
-export default App
+export default App;
