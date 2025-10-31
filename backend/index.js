@@ -8,11 +8,14 @@ const jwt = require("jsonwebtoken");
 const cors = require("cors");
 const express = require("express");
 const path = require('path');
+const web3 = require("./web3-methods");
 const app = express();
-const port = 8000;
+const port = process.env.PORT || 5001;
 //imports
 const connectDB = require("./config/db.js");
 const authRoutes = require("./routes/authRoute.js");
+const clientRoutes = require("./routes/client");
+const adminRoutes = require("./routes/admin");
 
 
 //connect to db:
@@ -28,11 +31,23 @@ app.use(
   })
 );
 
+// initialize web3
+web3.initializeWeb3();
+
+// health check
+app.get("/", async (req, res) => {
+  res.json({ message: "Success" });
+});
+
 //create user:
 app.use("/api/auth", authRoutes);
 
+// app routes
+app.use("/client", clientRoutes);
+app.use("/admin", adminRoutes);
 
 
-app.listen(port, () => {
+
+app.listen(port, '0.0.0.0', () => {
   console.log(`Server is running on port ${port}`);
 });
