@@ -6,6 +6,95 @@ const csv = require("csv-parser");
 const { DateTime } = require("luxon");
 const path = require("path");
 const fillColors = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
+const Log= require('../models/dataModel')
+const BlockedIP=require('../models/BlockedIpModel')
+router.get("/getAllLogs", async (req, res) => {
+  try {
+    // Fetch all logs from MongoDB using the Log model
+    const logs = await Log.find();
+
+    // Return success response with all logs
+    res.status(200).json({
+      success: true,
+      count: logs.length,
+      data: logs,
+    });
+  } catch (error) {
+    console.error("Error fetching logs:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server error while fetching logs",
+    });
+  }
+});
+router.post("/blockIP", async (req, res) => {
+  try {
+    const { destination, campLocation, source, userId, timestamp } = req.body;
+
+    // 1️⃣ Validate required fields
+    if (!destination || !campLocation || !source || !userId || !timestamp) {
+      return res.status(400).json({
+        success: false,
+        message: "Missing required fields.",
+      });
+    }
+
+    // 2️⃣ Check if destination already blocked
+    const existingBlocked = await BlockedIP.findOne({ destination });
+    if (existingBlocked) {
+      return res.status(200).json({
+        success: false,
+        message: "This IP is already blocked.",
+        data: existingBlocked,
+      });
+    }
+
+    // 3️⃣ Create and save new blocked IP
+    const newBlockedIP = new BlockedIP({
+      destination,
+      campLocation,
+      source,
+      userId,
+      timestamp,
+    });
+
+    await newBlockedIP.save();
+
+    // 4️⃣ Return success response
+    res.status(201).json({
+      success: true,
+      message: "IP successfully added to blocked list.",
+      data: newBlockedIP,
+    });
+  } catch (error) {
+    console.error("Error blocking IP:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server error while blocking IP.",
+    });
+  }
+});
+
+
+router.get("/getAllBlockedIPS", async (req, res) => {
+  try {
+    // Fetch all blocked IPs, sorted by newest first
+    const blockedIPs = await BlockedIP.find().sort({ createdAt: -1 });
+
+    res.status(200).json({
+      success: true,
+      count: blockedIPs.length,
+      data: blockedIPs,
+    });
+  } catch (error) {
+    console.error("Error fetching blocked IPs:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server error while fetching blocked IPs",
+    });
+  }
+});
+
 router.get("/dashboard", async (req, res) => {
   let { threshold } = req.query;
   if (threshold) threshold = parseFloat(threshold);

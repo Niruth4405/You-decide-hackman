@@ -10,12 +10,17 @@ import Navbar from "./client/components/navbar";
 import { useLocation } from "react-router-dom";
 import ParticlesComponent from "./client/components/bg";
 import Features from "./client/components/features";
+import AllLogs from "./admin/components/AllLogs"
+import BlockedIps from "./admin/components/BlockedIPS"
+import AdminNavbar from "./admin/components/AdminNavbar"
 const App = () => {
   const location = useLocation();
   return (
     <>
-      
-    {location.pathname !== '/'&& location.pathname!=="/login"&&location.pathname!=="/signup"&& <Navbar />}
+      {location.pathname !== '/'&&location.pathname !== '/dashboard'&& location.pathname!=="/log" &&
+      location.pathname !== '/login'&&location.pathname !== '/features'&& location.pathname!=="/signup" && 
+     < AdminNavbar/>}
+    {location.pathname !== '/admin/blockedips'&&location.pathname !== '/'&& location.pathname!=="/admin/allLogs" && location.pathname!=="/login"&&location.pathname!=="/signup"&& <Navbar />}
    <Routes>
 
     <Route path="/" element={<LandingPage />} />
@@ -24,6 +29,8 @@ const App = () => {
       <Route path='/login' element={<Login/>} />
        <Route path='/features' element={<Features/>} />
       <Route path='/signup' element={<Signup/>} />
+      <Route path="/admin/allLogs" element={<AllLogs/>} />
+      <Route path="/admin/blockedips" element={<BlockedIps/>} />
     </Routes>
 </>
   );
