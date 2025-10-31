@@ -2,14 +2,14 @@ import React from "react";
 
 import { Button, Input, Select, SelectItem } from "@nextui-org/react";
 import { useState } from "react";
-import { addNumberofLogstoDatabase } from "../utils";
-import * as data from "../data";
+ import { addNumberofLogstoDatabase } from "../utils";
+ import * as data from "../data";
 
 export default function CreateNlogs() {
   const [number, setNumber] = useState(0);
   const [campLocation, setCampLocation] = useState("");
   return (
-    <div className="max-w-[800px] mx-auto flex flex-col gap-8">
+    <div className="max-w-[800px] mx-auto flex flex-col gap-8 bg-amber-700">
       <div className="text-2xl uppercase underline text-center w-full">
         Add Random N Number of Logs
       </div>

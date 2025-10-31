@@ -1,9 +1,9 @@
 import React from 'react'
-
+import Client from './client/ClientMain'
 const App = () => {
   return (
     <div>
-      <h1 className="text-center">Hello world</h1>
+      <Client/>
     </div>
   )
 }
