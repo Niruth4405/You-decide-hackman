@@ -11,9 +11,10 @@ router.post("/addLog", async (req, res) => {
   try {
     const  logData  = req.body;
     console.log("Received log data:", logData);
-      const userEmail=logData.user;
+      const userId=logData.userId;
     // 1️⃣ Find the user (for DB reference)
-    const user = await User.findOne({ email: userEmail });
+    const user = await User.findById(userId);
+
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }

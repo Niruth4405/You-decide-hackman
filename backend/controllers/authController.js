@@ -49,7 +49,7 @@ const registerUser = async (req, res) => {
 
     return res.status(201).json({
       error: false,
-      user: { name: user.ame, email: user.email },
+      user: { name: user._id, email: user.email },
       accessToken,
       message: "Account created successfully",
     });
