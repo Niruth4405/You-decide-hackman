@@ -1,17 +1,31 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
-import AdminLogin from "./admin/components/Login.jsx";
+import Client from "./client/ClientMain";
 import Login from "./client/components/Login";
-import Signup from "./client/components/Signup.jsx";
-
+import Signup from "./client/components/Signup";
+import AddSingleLogEntry from "./client/components/AddSingleLogEntry";
+import CreateNlogs from "./client/components/CreateNlogs";
+import LandingPage from "./client/components/landingPage";
+import Navbar from "./client/components/navbar";
+import { useLocation } from "react-router-dom";
+import ParticlesComponent from "./client/components/bg";
+import Features from "./client/components/features";
 const App = () => {
   const location = useLocation();
   return (
-    <Routes>
-      <Route path="/admin" element={<AdminLogin />} />
+    <>
+      
+    {location.pathname !== '/'&& location.pathname!=="/login"&&location.pathname!=="/signup"&& <Navbar />}
+   <Routes>
+
+    <Route path="/" element={<LandingPage />} />
+    <Route path="/dashboard" element={<AddSingleLogEntry />} />
+      <Route path='/log' element={<CreateNlogs/>} />
       <Route path='/login' element={<Login/>} />
+       <Route path='/features' element={<Features/>} />
       <Route path='/signup' element={<Signup/>} />
     </Routes>
+</>
   );
 };
 

@@ -39,7 +39,7 @@ const logSchema = new mongoose.Schema(
     },
     eventSeverity: {
       type: String,
-      enum: ["info", "warning", "critical"],
+      enum: ["info", "warning", "Critical","Medium","Low","High"],
       required: true,
     },
     campLocation: {

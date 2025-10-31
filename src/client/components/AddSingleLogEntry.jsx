@@ -1,5 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Dices, Check, ShieldCheck, ShieldAlert, ClipboardList } from "lucide-react";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 // Mock data for demo
 const mockData = {
@@ -26,6 +28,27 @@ const replaceVariable = (template, data) => {
   return template.replace(/{(\w+)}/g, (match, key) => data[key] || match);
 };
 
+// Function to decode JWT and extract userId
+const getUserIdFromToken = () => {
+  try {
+    const token = localStorage.getItem("authToken");
+    if (!token) return null;
+    
+    // Decode JWT token (assuming it's a standard JWT)
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+      return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
+    
+    const decoded = JSON.parse(jsonPayload);
+    return decoded.userId || decoded.id || decoded.sub || null;
+  } catch (error) {
+    console.error("Error decoding token:", error);
+    return null;
+  }
+};
+
 const initialLogData = {
   timestamp: "",
   source: "",
@@ -42,18 +65,66 @@ export default function Inputs() {
   const [logData, setlogData] = useState(initialLogData);
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [userId, setUserId] = useState(null);
+
+  useEffect(() => {
+    // Get userId from token on component mount
+    const id = getUserIdFromToken();
+    if (id) {
+      setUserId(id);
+    } else {
+      toast.error("Unable to retrieve user information. Please login again.");
+    }
+  }, []);
 
   const handleSubmit = async () => {
+    // Validation
+    if (!userId) {
+      toast.error("User not authenticated. Please login again.");
+      return;
+    }
+
+    if (!logData.timestamp || !logData.source || !logData.destination || 
+        !logData.user || !logData.device || !logData.eventType || 
+        !logData.eventSeverity || !logData.campLocation) {
+      toast.error("Please fill in all required fields");
+      return;
+    }
+
     setIsLoading(true);
     setIsSuccess(false);
+
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      setIsSuccess(true);
-      setlogData(initialLogData);
-      setTimeout(() => setIsSuccess(false), 3000);
+      const token = localStorage.getItem("authToken");
+      console.log("logdata",logData);
+      console.log("token",token);
+      console.log("user id",userId);
+
+      const response = await fetch("http://localhost:5001/client/addLog", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          ...logData,
+          userId: userId
+        })
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setIsSuccess(true);
+        toast.success("Log entry added successfully!");
+        setlogData(initialLogData);
+        setTimeout(() => setIsSuccess(false), 3000);
+      } else {
+        toast.error(data.message || "Failed to add log entry");
+      }
     } catch (error) {
       console.error("Failed to add log entry:", error);
+      toast.error("Unable to connect to server. Please try again later.");
     } finally {
       setIsLoading(false);
     }
@@ -114,6 +185,19 @@ export default function Inputs() {
 
   return (
     <div className="min-h-screen flex justify-center items-center px-4 py-10">
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="dark"
+      />
+
       <div className="w-full max-w-6xl bg-gray-900/80 rounded-2xl shadow-2xl overflow-hidden flex flex-col lg:flex-row border border-gray-800">
         {/* Left Sidebar */}
         <div className="w-full lg:w-1/3 bg-gradient-to-br from-blue-900 via-blue-950 to-gray-950 p-10 text-white flex flex-col justify-center relative overflow-hidden">
