@@ -10,29 +10,42 @@ import Navbar from "./client/components/navbar";
 import { useLocation } from "react-router-dom";
 import ParticlesComponent from "./client/components/bg";
 import Features from "./client/components/features";
-import AllLogs from "./admin/components/AllLogs"
-import BlockedIps from "./admin/components/BlockedIPS"
-import AdminNavbar from "./admin/components/AdminNavbar"
+import AllLogs from "./admin/components/AllLogs";
+import BlockedIps from "./admin/components/BlockedIPS";
+import LogAnalysis from "./admin/components/LogAnalysis";
+import AdminNavbar from "./admin/components/AdminNavbar";
+
 const App = () => {
   const location = useLocation();
+  
+  // Define admin routes for easier maintenance
+  const adminRoutes = ['/admin/allLogs', '/admin/blockedips', '/admin/log-analysis'];
+  const isAdminRoute = adminRoutes.includes(location.pathname);
+  
+  // Define public routes where no navbar should show
+  const publicRoutes = ['/', '/login', '/signup', '/features'];
+  const isPublicRoute = publicRoutes.includes(location.pathname);
+  
   return (
     <>
-      {location.pathname !== '/'&&location.pathname !== '/dashboard'&& location.pathname!=="/log" &&
-      location.pathname !== '/login'&&location.pathname !== '/features'&& location.pathname!=="/signup" && 
-     < AdminNavbar/>}
-    {location.pathname !== '/admin/blockedips'&&location.pathname !== '/'&& location.pathname!=="/admin/allLogs" && location.pathname!=="/login"&&location.pathname!=="/signup"&& <Navbar />}
-   <Routes>
-
-    <Route path="/" element={<LandingPage />} />
-    <Route path="/dashboard" element={<AddSingleLogEntry />} />
-      <Route path='/log' element={<CreateNlogs/>} />
-      <Route path='/login' element={<Login/>} />
-       <Route path='/features' element={<Features/>} />
-      <Route path='/signup' element={<Signup/>} />
-      <Route path="/admin/allLogs" element={<AllLogs/>} />
-      <Route path="/admin/blockedips" element={<BlockedIps/>} />
-    </Routes>
-</>
+      {/* Show AdminNavbar for all admin routes */}
+      {isAdminRoute && <AdminNavbar />}
+      
+      {/* Show regular Navbar for client routes (not admin, not public) */}
+      {!isAdminRoute && !isPublicRoute && location.pathname !== '/dashboard' && location.pathname !== '/log' && <Navbar />}
+      
+      <Routes>
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/dashboard" element={<AddSingleLogEntry />} />
+        <Route path='/log' element={<CreateNlogs />} />
+        <Route path='/login' element={<Login />} />
+        <Route path='/features' element={<Features />} />
+        <Route path='/signup' element={<Signup />} />
+        <Route path="/admin/allLogs" element={<AllLogs />} />
+        <Route path="/admin/blockedips" element={<BlockedIps />} />
+        <Route path="/admin/log-analysis" element={<LogAnalysis />} />
+      </Routes>
+    </>
   );
 };
 
