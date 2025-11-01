@@ -154,7 +154,7 @@ const LogAnalysis = () => {
   const topDestinations = getTopDestinations();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 p-6">
+    <div className="min-h-screen bg-gradient-to-br  p-6">
       {error && (
         <div className="max-w-7xl mx-auto mb-4">
           <div className="bg-red-500/20 border border-red-500 rounded-lg p-4 flex items-center gap-3">
