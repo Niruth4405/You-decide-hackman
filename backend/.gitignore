@@ -2,3 +2,9 @@ node_modules
 /centralLogDatabase
 /localLogDatabase
 build
+.env
+.DS_Store
+.vscode
+dist
+*.log
+
